@@ -1,0 +1,92 @@
+# Custom configuration for default-new-users-to-launch-firefox-when-windows-starts.
+#
+# Adds launch method share metrics to compare the distribution of how users
+# launch Firefox between treatment (auto-start enabled) and control.
+
+# --- Launch method share metrics ---
+# Per-client share of launches by method. Jetstream computes branch-level
+# means + CIs over these per-client ratios, letting us compare the
+# distribution of launch methods between treatment and control.
+
+[metrics]
+weekly = [
+  "share_autostart_launches",
+  "share_taskbar_launches",
+  "share_startmenu_launches",
+  "share_desktop_launches",
+  "share_other_launches",
+  "number_of_autostart_launches",
+  "number_of_sessions",
+]
+
+[metrics.share_autostart_launches]
+select_expression = """SAFE_DIVIDE(
+  COUNTIF(metrics.string.os_environment_launch_method = 'Autostart'),
+  COUNTIF(metrics.string.os_environment_launch_method IS NOT NULL)
+)"""
+data_source = "metrics"
+friendly_name = "Share of Launches via Autostart"
+description = "Per-client fraction of launches that used the Windows auto-start mechanism."
+type = "scalar"
+
+[metrics.share_autostart_launches.statistics.bootstrap_mean]
+[metrics.share_autostart_launches.statistics.deciles]
+
+[metrics.share_taskbar_launches]
+select_expression = """SAFE_DIVIDE(
+  COUNTIF(metrics.string.os_environment_launch_method IN ('Taskbar', 'TaskbarPrivate', 'TaskbarTab')),
+  COUNTIF(metrics.string.os_environment_launch_method IS NOT NULL)
+)"""
+data_source = "metrics"
+friendly_name = "Share of Launches via Taskbar"
+description = "Per-client fraction of launches from Taskbar (normal, private, and tab combined)."
+type = "scalar"
+
+[metrics.share_taskbar_launches.statistics.bootstrap_mean]
+[metrics.share_taskbar_launches.statistics.deciles]
+
+[metrics.share_startmenu_launches]
+select_expression = """SAFE_DIVIDE(
+  COUNTIF(metrics.string.os_environment_launch_method IN ('StartMenu', 'StartMenuPrivate')),
+  COUNTIF(metrics.string.os_environment_launch_method IS NOT NULL)
+)"""
+data_source = "metrics"
+friendly_name = "Share of Launches via Start Menu"
+description = "Per-client fraction of launches from Start Menu (normal + private)."
+type = "scalar"
+
+[metrics.share_startmenu_launches.statistics.bootstrap_mean]
+[metrics.share_startmenu_launches.statistics.deciles]
+
+[metrics.share_desktop_launches]
+select_expression = """SAFE_DIVIDE(
+  COUNTIF(metrics.string.os_environment_launch_method IN ('Desktop', 'DesktopPrivate', 'DesktopLauncher')),
+  COUNTIF(metrics.string.os_environment_launch_method IS NOT NULL)
+)"""
+data_source = "metrics"
+friendly_name = "Share of Launches via Desktop Shortcut"
+description = "Per-client fraction of launches from Desktop shortcuts and launchers."
+type = "scalar"
+
+[metrics.share_desktop_launches.statistics.bootstrap_mean]
+[metrics.share_desktop_launches.statistics.deciles]
+
+[metrics.share_other_launches]
+select_expression = """SAFE_DIVIDE(
+  COUNTIF(metrics.string.os_environment_launch_method IN ('Other', 'OtherShortcut')),
+  COUNTIF(metrics.string.os_environment_launch_method IS NOT NULL)
+)"""
+data_source = "metrics"
+friendly_name = "Share of Launches via Other Methods"
+description = "Per-client fraction of launches from other/unknown methods."
+type = "scalar"
+
+[metrics.share_other_launches.statistics.bootstrap_mean]
+[metrics.share_other_launches.statistics.deciles]
+
+# Also include raw counts for context
+[metrics.number_of_autostart_launches.statistics.bootstrap_mean]
+[metrics.number_of_autostart_launches.statistics.deciles]
+
+[metrics.number_of_sessions.statistics.bootstrap_mean]
+[metrics.number_of_sessions.statistics.deciles]
